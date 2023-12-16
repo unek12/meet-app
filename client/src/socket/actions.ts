@@ -1,0 +1,17 @@
+export const ACTIONS = {
+  JOIN: 'join',
+  LEAVE: 'leave',
+  STOP_SHARING: 'stop-sharing',
+  SHARE_ROOMS: 'share-rooms',
+  ADD_PEER: 'add-peer',
+  REMOVE_PEER: 'remove-peer',
+  RELAY_SDP: 'relay-sdp',
+  RELAY_ICE: 'relay-ice',
+  ICE_CANDIDATE: 'ice-candidate',
+  SESSION_DESCRIPTION: 'session-description',
+  TOGGLE_MICROPHONE: 'mic-toggle',
+  TOGGLE_OPTIONS: 'toggle-options',
+  TOGGLE_VIDEO: 'video-toggle',
+  SCREEN_SHARE: 'screen-sharing',
+  ADD_SCREEN_SHARE: 'add-screen-share',
+};
