@@ -1,5 +1,6 @@
 import React, {FC, RefObject, useEffect, useRef, useState} from 'react';
 import {LOCAL_VIDEO, localMediaStreamsType} from "../../hooks/useWebRTC";
+import {AudioMutedOutlined, AudioOutlined} from "@ant-design/icons";
 
 export const LocalVideo: FC<{
   clientID: string,
@@ -13,7 +14,7 @@ export const LocalVideo: FC<{
   const videoRef = useRef<HTMLVideoElement>(null)
   // const [video, setVideo] = useState(localMediaStreams.current![clientID].video)
   // const [mic, setMic] = useState(localMediaStreams.current![clientID].microphone)
-  const [imgUrl, setImgUrl ] = useState('')
+  const [imgUrl, setImgUrl] = useState('')
   const [username, setUsername] = useState('')
 
   useEffect(() => {
@@ -46,6 +47,27 @@ export const LocalVideo: FC<{
       }}>
         you
       </div>
+
+      {
+        mic ?
+          <AudioOutlined
+            style={{
+              position: 'absolute',
+              bottom: 20,
+              right: 25,
+              fontSize: 20,
+            }}
+          />
+          :
+          <AudioMutedOutlined
+            style={{
+              position: 'absolute',
+              bottom: 20,
+              right: 25,
+              fontSize: 20,
+            }}
+          />
+      }
 
       <div style={{
         display: video ? 'none' : 'block',

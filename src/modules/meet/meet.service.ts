@@ -113,21 +113,6 @@ export class MeetService {
     take: number
     userId: string
   }) {
-    const data = (await Promise.all([
-      // this.prisma.meeting.findMany({
-      //   skip: page * take,
-      //   take,
-      //   where: {
-      //     organizer: {
-      //       id: userId
-      //     }
-      //   },
-      //   include: {
-      //     organizer: true
-      //   }
-      // }),
-    ])).flat(1)
-      // .sort((a, b) => a.createdAt.getMilliseconds() + b.createdAt.getMilliseconds())
     return {
       data: await this.prisma.meeting.findMany({
         skip: page * take,

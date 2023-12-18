@@ -66,7 +66,7 @@ const JoiningRoom: FC<Props> = ({children}) => {
   // }, [localMediaStream]);
 
   if (joined) {
-    return <Meet initMic={true} initVideo={true}/>
+    return <Meet initMic={mic} initVideo={video}/>
   }
 
   return (

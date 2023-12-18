@@ -27,14 +27,6 @@ export const MeetTab: React.FC = () => {
     take: 10
   })
 
-  useEffect(() => {
-    console.log(data)
-  }, [data]);
-
-  useEffect(() => {
-    console.log(isFetching)
-  }, [isFetching]);
-
   const handleSearch = (
     selectedKeys: string[],
     confirm: (param?: FilterConfirmProps) => void,
@@ -148,7 +140,6 @@ export const MeetTab: React.FC = () => {
         current={current + 1}
         total={(data?.pages + 1) * 10}
         onChange={(page) => {
-          console.log(page);
           setCurrent(page - 1);
         }}
       />

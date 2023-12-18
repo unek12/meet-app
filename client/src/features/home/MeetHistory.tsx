@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Button, List, Pagination} from 'antd';
 import {useGetMeetingsForUserQuery} from "../../services/meet";
 import {useAuth} from "../../hooks/useAuth";
+import {useNavigate} from "react-router-dom";
 
 const data = [
   'Racing car sprays burning fuel into crowd.',
@@ -18,11 +19,12 @@ const MeetHistory: React.FC = () => {
   const [initLoading, setInitLoading] = useState(true);
   const [current, setCurrent] = useState(0);
   const user = useAuth()!
-  const {data, isLoading} = useGetMeetingsForUserQuery({
+  const {data, isLoading, isFetching} = useGetMeetingsForUserQuery({
     userId: user.id,
     page: current,
     take: 10
   })
+  const nav = useNavigate()
   useEffect(() => {
     console.log(data)
   }, [data]);
@@ -56,8 +58,8 @@ const MeetHistory: React.FC = () => {
           }
         bordered
         dataSource={data?.data || []}
-        loading={isLoading}
-        renderItem={(item: {title: string, date: string}) => (
+        loading={isFetching}
+        renderItem={(item: {title: string, date: string, id: string}) => (
           <List.Item>
             <div style={{
               display: 'flex',
@@ -73,7 +75,13 @@ const MeetHistory: React.FC = () => {
                   item.date
                 }
               </div>
-              <Button>details</Button>
+              <Button
+                onClick={() => {
+                  nav(`/chat/${item.id}`)
+                }}
+              >
+                details
+              </Button>
             </div>
           </List.Item>
         )}

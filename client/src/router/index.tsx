@@ -8,6 +8,7 @@ import {Home} from "../features/home/Home";
 import Meet from "../features/meet/Meet";
 import JoiningRoom from "../features/meet/JoiningRoom";
 import AdminPanel from "../features/admin/AdminPanel";
+import {ChatHistory} from "../features/home/ChatHistory";
 
 export const router = createBrowserRouter([
   {
@@ -38,5 +39,9 @@ export const router = createBrowserRouter([
   {
     path: '/admin',
     element: <AuthWrapper><AdminPanel/></AuthWrapper>
+  },
+  {
+    path: '/chat/:id',
+    element: <AuthWrapper><ChatHistory/></AuthWrapper>
   }
 ])

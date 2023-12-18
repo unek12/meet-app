@@ -21,6 +21,7 @@
     "peer": "^1.0.1",
     "peerjs": "^1.5.1",
     "react": "^18.2.0",
+    "react-copy-to-clipboard": "^5.1.0",
     "react-dom": "^18.2.0",
     "react-modal": "^3.16.1",
     "react-redux": "^8.1.2",

@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Req, UseGuards} from '@nestjs/common';
+import {Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query, Req, UseGuards} from '@nestjs/common';
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UsersService } from "./users.service";
 import {accessTokenGuard} from "../../guards/accessToken.guard";
@@ -11,12 +11,12 @@ export class UsersController {
   constructor(private usersService: UsersService) {
   }
 
-  @UseGuards(accessTokenGuard)
-  @Get()
-  getAll(@Req() req: Request) {
-    console.log(req.query)
-    return this.usersService.findAll()
-  }
+  // @UseGuards(accessTokenGuard)
+  // @Get()
+  // getAll(@Req() req: Request) {
+  //   console.log(req.query)
+  //   return this.usersService.findAll()
+  // }
 
   @UseGuards(accessTokenGuard)
   @Post()
@@ -34,5 +34,10 @@ export class UsersController {
   @Get(':id')
   getUser(@Param('id') id: string) {
     return this.usersService.findById(id)
+  }
+
+  @Get()
+  getUsers(@Query('page') page = 0, @Query('take') take = 10) {
+    return this.usersService.getUsers({page, take: +take})
   }
 }

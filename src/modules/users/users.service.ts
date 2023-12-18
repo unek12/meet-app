@@ -48,11 +48,24 @@ export class UsersService {
       }
     })
   }
-
   updateRefreshToken(username: string, token: string) {
     return this.prisma.user.update({
       where: {username},
       data: {refresh: token}
     })
+  }
+
+  async getUsers({page, take = 10}: {
+    page: number
+    take: number
+  }) {
+    return {
+      data: await this.prisma.user.findMany({
+        skip: page * take,
+        take,
+      }),
+      pages: Math.ceil(await this.prisma.user.count() / take) - 1,
+      currentPage: page
+    }
   }
 }

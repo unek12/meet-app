@@ -12,6 +12,13 @@ export const userApi = createApi({
   reducerPath: 'userApi',
   baseQuery: customFetchBase,
   endpoints: (builder) => ({
+    getUsers: builder.query<any, { page: number, take: number }>({
+      query: (options) => ({
+        url: `users`,
+        params: options,
+        method: 'GET'
+      }),
+    }),
     userUpdate: builder.mutation<User, UpdateUserRequest>({
       query: (userData) => ({
         url: 'users',
@@ -24,4 +31,5 @@ export const userApi = createApi({
 
 export const {
   useUserUpdateMutation,
+  useGetUsersQuery
 } = userApi

@@ -2,6 +2,7 @@ import React, {FC, RefObject, useEffect, useRef, useState} from 'react';
 import {LOCAL_VIDEO, peerConnectionsType} from "../../hooks/useWebRTC";
 import socket from "../../socket";
 import {ACTIONS} from "../../socket/actions";
+import {AudioMutedOutlined, AudioOutlined} from "@ant-design/icons";
 
 export const Video: FC<{
   clientID: string,
@@ -86,6 +87,27 @@ export const Video: FC<{
       }}>
         {username}
       </div>
+
+      {
+        mic ?
+          <AudioOutlined
+            style={{
+              position: 'absolute',
+              bottom: 20,
+              right: 25,
+              fontSize: 20,
+            }}
+          />
+          :
+          <AudioMutedOutlined
+            style={{
+              position: 'absolute',
+              bottom: 20,
+              right: 25,
+              fontSize: 20,
+            }}
+          />
+      }
 
       <div style={{
         display: video ? 'none' : 'block',

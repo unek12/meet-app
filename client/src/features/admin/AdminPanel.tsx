@@ -5,6 +5,7 @@ import {Menu} from 'antd';
 import { UserTab } from './UserTab';
 import {MeetTab} from "./MeetTab";
 import {useNavigate} from "react-router-dom";
+import {useAuth} from "../../hooks/useAuth";
 
 const items: MenuProps['items'] = [
   {
@@ -26,6 +27,7 @@ const items: MenuProps['items'] = [
 
 const AdminPanel: React.FC = () => {
   const [current, setCurrent] = useState('meet');
+  const user = useAuth()!
   const nav = useNavigate()
 
   const onClick: MenuProps['onClick'] = (e) => {
@@ -38,6 +40,10 @@ const AdminPanel: React.FC = () => {
       nav('/')
     }
   }, [current]);
+
+  useEffect(() => {
+    if (!user.isAdmin) nav('/')
+  }, []);
 
   return (
     <>

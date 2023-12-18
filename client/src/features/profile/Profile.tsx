@@ -82,10 +82,17 @@ export const Profile = () => {
       right: 10
     }}>
       <Button type={'primary'} onClick={openModal}>Profile</Button>
-      <Button style={{
-        marginLeft: 10
-      }} onClick={() => nav('/admin')}
-      >Admin panel</Button>
+      {
+        user.isAdmin &&
+        <Button
+          style={{
+            marginLeft: 10
+          }}
+          onClick={() => nav('/admin')}
+        >
+          Admin panel
+        </Button>
+      }
       <Modal
         open={modalIsOpen}
         // afterOpenChange={afterOpenModal}

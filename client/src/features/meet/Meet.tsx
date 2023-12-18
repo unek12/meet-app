@@ -7,6 +7,7 @@ import {Video} from "./Video";
 import {LocalVideo} from "./LocalVideo";
 import {LocalSharing} from "./LocalSharing";
 import {Button} from "antd";
+import {MeetIdPopUp} from "./MeetIdPopUp";
 
 function calculateDimensions(userCount: number, totalWidth: number, totalHeight: number) {
   const aspectRatio = 16 / 9; // Формат 16:9
@@ -85,7 +86,8 @@ const Meet: FC<{
   return (
     <div style={{
       display: "flex",
-      overflow: "hidden"
+      overflow: "hidden",
+      position: "relative"
     }}>
       <div style={{
         width: chat ? '70vw' : '100vw',
@@ -151,7 +153,7 @@ const Meet: FC<{
               style={{
                 margin: '0 5px'
               }}
-              type={'primary'}
+              type={mic ? 'primary' : 'default'}
               onClick={() => {
                 toggleOptions({
                   isVideoOn: video,
@@ -166,7 +168,7 @@ const Meet: FC<{
               style={{
                 margin: '0 5px'
               }}
-              type={'primary'}
+              type={video ? 'primary' : 'default'}
               onClick={() => {
                 toggleOptions({
                   isVideoOn: !video,
@@ -200,7 +202,7 @@ const Meet: FC<{
           <div>
             <Button
               type={'primary'}
-              // onClick={() => setChat(!chat)}
+              onClick={() => nav('/')}
             >
               leave
             </Button>
@@ -215,7 +217,7 @@ const Meet: FC<{
       }}>
         <Chat roomID={roomID!}/>
       </div>
-
+      <MeetIdPopUp roomID={roomID!}/>
     </div>
   );
 }
