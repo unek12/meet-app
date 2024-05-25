@@ -6,6 +6,26 @@ import Search from 'antd/es/input/Search';
 import {Button, Input} from "antd";
 import MeetHistory from "./MeetHistory";
 import {useAuth} from "../../hooks/useAuth";
+import { Footer, Header } from 'antd/es/layout/layout';
+
+const footerStyle: React.CSSProperties = {
+  textAlign: 'center',
+  color: '#fff',
+  backgroundColor: '#4096ff',
+};
+
+const headerStyle: React.CSSProperties = {
+  textAlign: 'center',
+  color: '#fff',
+  height: 300,
+  paddingInline: 48,
+  lineHeight: '64px',
+  // backgroundColor: '#4096ff',
+  backgroundImage: "url('/imgs/background.jpg')",
+  backgroundPosition: 'center',
+  backgroundSize: 'cover',
+  backgroundRepeat: 'no-repeat'
+};
 
 export const Home = () => {
   const [createMeeting, {isLoading}] = useCreateMeetingMutation()
@@ -20,6 +40,7 @@ export const Home = () => {
       // position: "relative",
       // display: 'flex'
     }}>
+      <Header style={headerStyle}></Header>
       <div style={{
         maxWidth: 800,
         margin: '10px auto',
@@ -34,7 +55,7 @@ export const Home = () => {
               style={{
                 margin: '0 40px'
               }}
-              placeholder={'meeting title'}
+              placeholder={'название видеовстречи'}
               value={meetName}
               onChange={(e) => {
                 setMeetName(e.target.value)
@@ -43,7 +64,7 @@ export const Home = () => {
             <Button type='primary' disabled={isLoading} onClick={async () => {
               const a = await createMeeting({title: meetName || `${user.name} meeting`}).unwrap()
               nav(`/meet/${a['id']}`)
-            }}>create meeting</Button>
+            }}>Создать видео встречу</Button>
           </div>
           <div style={{
             display: 'flex',
@@ -54,7 +75,7 @@ export const Home = () => {
               style={{
                 margin: '0 55px 0 40px'
               }}
-              placeholder={'joining meet id'}
+              placeholder={'айди видео встречи'}
               value={roomID}
               onChange={(e) => {
                 setRoomID(e.target.value)
@@ -66,13 +87,14 @@ export const Home = () => {
               onClick={() => {
                 nav(`/meet/${roomID}`)
               }}
-            >join meeting</Button>
+            >присоединится</Button>
           </div>
         </div>
 
         <Profile/>
         <MeetHistory/>
       </div>
+      <Footer style={footerStyle}>Video Chat ©2024 Created by Egor Rudman</Footer>
     </div>
   );
 };

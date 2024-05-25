@@ -81,7 +81,7 @@ export const Profile = () => {
       top: 10,
       right: 10
     }}>
-      <Button type={'primary'} onClick={openModal}>Profile</Button>
+      <Button type={'primary'} onClick={openModal}>Профиль</Button>
       {
         user.isAdmin &&
         <Button
@@ -103,8 +103,13 @@ export const Profile = () => {
           maxHeight: 600,
           margin: "auto",
         }}
-        title="Example Modal"
+        title="Профиль"
         footer={[
+          <Button key="logout" onClick={() => {
+
+          }}>
+            Выйти
+          </Button>,
           <Button key="back" onClick={closeModal}>
             Отмена
           </Button>,
@@ -196,7 +201,7 @@ export const Profile = () => {
                 marginBottom: 0
               }}>
                 {<PlusOutlined/>}
-                <div style={{marginTop: 8}}>Upload</div>
+                <div style={{marginTop: 8}}>Загрузить</div>
               </div>
             </Upload>
           </div>

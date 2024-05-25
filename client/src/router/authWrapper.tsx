@@ -3,6 +3,7 @@ import {useDispatch} from "react-redux";
 import {useProfileQuery} from "../services/auth";
 import {setUser} from "../features/auth/authSlice";
 import {useAuth} from "../hooks/useAuth";
+import { Loader } from '../features/loading/loading';
 
 type Props = {
   children?: React.ReactNode
@@ -19,7 +20,7 @@ export const AuthWrapper: FC<Props> = ({children}) => {
   }, [data, user]);
 
   if (isLoading) {
-    return <p>loading</p>
+    return <Loader/>
   }
 
   if (user) {

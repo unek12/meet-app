@@ -1,36 +1,45 @@
-import {Injectable} from '@nestjs/common';
-import {UsersService} from "../users/users.service";
-import {PrismaService} from "../prisma/prisma.service";
-import * as moment from "moment";
+import { Injectable } from '@nestjs/common';
+import { UsersService } from '../users/users.service';
+import { PrismaService } from '../prisma/prisma.service';
+import * as moment from 'moment';
 
 @Injectable()
 export class MeetService {
   constructor(
     private readonly usersService: UsersService,
-    private prisma: PrismaService
-  ) {
-  }
+    private prisma: PrismaService,
+  ) {}
 
-  async getMeetingsStatistics(options: {
-    interval: 'day' | 'week' | 'month';
-  }) {
+  async getMeetingsStatistics(options: { interval: 'day' | 'week' | 'month' }) {
     const currentDate = moment();
-    const {startDate, endDate} = this.getDateRange(options.interval, currentDate);
+    const { startDate, endDate } = this.getDateRange(
+      options.interval,
+      currentDate,
+    );
     const counts = {};
 
     let currentDateIter = moment(startDate);
     while (currentDateIter <= endDate) {
-      const count = await this.getCountForInterval(options.interval, currentDateIter.toDate());
+      const count = await this.getCountForInterval(
+        options.interval,
+        currentDateIter.toDate(),
+      );
       const formattedDate = currentDateIter.format('YYYY-MM-DD');
       counts[formattedDate] = count || 0;
 
-      currentDateIter = this.getNextIntervalDate(options.interval, currentDateIter);
+      currentDateIter = this.getNextIntervalDate(
+        options.interval,
+        currentDateIter,
+      );
     }
 
     return counts;
   }
 
-  private getDateRange(interval: 'day' | 'week' | 'month', currentDate: moment.Moment) {
+  private getDateRange(
+    interval: 'day' | 'week' | 'month',
+    currentDate: moment.Moment,
+  ) {
     let startDate: moment.Moment;
     let endDate: moment.Moment;
 
@@ -45,10 +54,13 @@ export class MeetService {
       endDate = currentDate.clone();
     }
 
-    return {startDate, endDate};
+    return { startDate, endDate };
   }
 
-  private async getCountForInterval(interval: 'day' | 'week' | 'month', date: Date) {
+  private async getCountForInterval(
+    interval: 'day' | 'week' | 'month',
+    date: Date,
+  ) {
     const count = await this.prisma.meeting.count({
       where: this.getWhereClauseForInterval(interval, date),
     });
@@ -56,7 +68,10 @@ export class MeetService {
     return count;
   }
 
-  private getWhereClauseForInterval(interval: 'day' | 'week' | 'month', date: Date) {
+  private getWhereClauseForInterval(
+    interval: 'day' | 'week' | 'month',
+    date: Date,
+  ) {
     if (interval === 'day') {
       return {
         date: {
@@ -81,7 +96,10 @@ export class MeetService {
     }
   }
 
-  private getNextIntervalDate(interval: 'day' | 'week' | 'month', date: moment.Moment) {
+  private getNextIntervalDate(
+    interval: 'day' | 'week' | 'month',
+    date: moment.Moment,
+  ) {
     if (interval === 'day') {
       return date.clone().add(1, 'day');
     } else if (interval === 'week') {
@@ -91,27 +109,28 @@ export class MeetService {
     }
   }
 
-  async getMeetings({page, take = 10}: {
-    page: number
-    take: number
-  }) {
+  async getMeetings({ page, take = 10 }: { page: number; take: number }) {
     return {
       data: await this.prisma.meeting.findMany({
         skip: page * take,
         take,
         include: {
-          organizer: true
-        }
+          organizer: true,
+        },
       }),
-      pages: Math.ceil(await this.prisma.meeting.count() / take) - 1,
-      currentPage: page
-    }
+      pages: Math.ceil((await this.prisma.meeting.count()) / take) - 1,
+      currentPage: page,
+    };
   }
 
-  async getMeetingsForUser({page, take = 10, userId = ''}: {
-    page: number
-    take: number
-    userId: string
+  async getMeetingsForUser({
+    page,
+    take = 10,
+    userId = '',
+  }: {
+    page: number;
+    take: number;
+    userId: string;
   }) {
     return {
       data: await this.prisma.meeting.findMany({
@@ -120,60 +139,66 @@ export class MeetService {
         where: {
           participants: {
             some: {
-              userId: userId
-            }
-          }
+              userId: userId,
+            },
+          },
         },
         include: {
-          organizer: true
+          organizer: true,
         },
         orderBy: {
-          createdAt: 'desc'
-        }
+          createdAt: 'desc',
+        },
       }),
-      pages: Math.ceil((await this.prisma.meeting.count({
-        where: {
-          participants: {
-            some: {
-              userId: userId
-            }
-          }
-        },
-        orderBy: {
-          createdAt: 'desc'
-        }
-      })) / take) - 1,
-      currentPage: page
-    }
+      pages:
+        Math.ceil(
+          (await this.prisma.meeting.count({
+            where: {
+              participants: {
+                some: {
+                  userId: userId,
+                },
+              },
+            },
+            orderBy: {
+              createdAt: 'desc',
+            },
+          })) / take,
+        ) - 1,
+      currentPage: page,
+    };
   }
 
-  async creatMeet(userId: string, {title}: { title: string }) {
-    const user = await this.usersService.findById(userId)
+  async creatMeet(userId: string, { title }: { title: string }) {
+    const user = await this.usersService.findById(userId);
     return this.prisma.meeting.create({
       data: {
         title: title,
         organizer: {
-          connect: {id: user.id}
+          connect: { id: user.id },
         },
       },
       include: {
         organizer: true,
-        participants: true
-      }
-    })
+        participants: true,
+      },
+    });
   }
 
-  async joinMeet({roomID, socketId, userId, options}:
-                   {
-                     roomID: string,
-                     userId: string,
-                     socketId: string,
-                     options: {
-                       isVideoOn: boolean,
-                       isMicrophoneOn: boolean,
-                     }
-                   }
-  ) {
+  async joinMeet({
+    roomID,
+    socketId,
+    userId,
+    options,
+  }: {
+    roomID: string;
+    userId: string;
+    socketId: string;
+    options: {
+      isVideoOn: boolean;
+      isMicrophoneOn: boolean;
+    };
+  }) {
     const meeting = await this.prisma.meeting.findFirst({
       where: {
         id: roomID,
@@ -181,138 +206,146 @@ export class MeetService {
       include: {
         participants: {
           where: {
-            isPresent: true
-          }
-        }
-      }
-    })
+            isPresent: true,
+          },
+        },
+      },
+    });
 
     if (meeting.participants.length > 9) {
-      return false
+      return false;
     }
 
-    return this.prisma.meeting.update(
-      {
-        data: {
-          participants: {
-            create: {
-              isPresent: true,
-              isVideoOn: options.isVideoOn,
-              isMicrophoneOn: options.isMicrophoneOn,
-              socketId: socketId,
-              userId: userId
-              // where: {
-              //   userId: userId,
-              //   socketId: socketId,
-              //   isPresent: true
-              // }
-            }
-          }
+    return this.prisma.meeting.update({
+      data: {
+        participants: {
+          create: {
+            isPresent: true,
+            isVideoOn: options.isVideoOn,
+            isMicrophoneOn: options.isMicrophoneOn,
+            socketId: socketId,
+            userId: userId,
+            // where: {
+            //   userId: userId,
+            //   socketId: socketId,
+            //   isPresent: true
+            // }
+          },
         },
-        where: {id: roomID},
-        include: {
-          organizer: true, participants: {
-            include: {user: true}
-          }
-        }
-      }
-    )
+      },
+      where: { id: roomID },
+      include: {
+        organizer: true,
+        participants: {
+          include: { user: true },
+        },
+      },
+    });
   }
 
   getMeeting(userId: string, meetingId: string) {
-    return this.prisma.meeting.findFirst({where: {id: meetingId}})
+    return this.prisma.meeting.findFirst({ where: { id: meetingId } });
   }
 
-  toggleOptions({roomID, socketId, userId, options}: {
-    roomID: string,
-    socketId: string,
-    userId: string,
+  toggleOptions({
+    roomID,
+    socketId,
+    userId,
+    options,
+  }: {
+    roomID: string;
+    socketId: string;
+    userId: string;
     options: {
-      isVideoOn: boolean,
-      isMicrophoneOn: boolean,
-    }
+      isVideoOn: boolean;
+      isMicrophoneOn: boolean;
+    };
   }) {
-    return this.prisma.meeting.update(
-      {
-        data: {
-          participants: {
-            updateMany: {
-              data: {
-                isVideoOn: options.isVideoOn,
-                isMicrophoneOn: options.isMicrophoneOn,
-              },
-              where: {
-                userId: userId,
-                socketId: socketId,
-                isPresent: true
-              }
-            }
-          }
+    return this.prisma.meeting.update({
+      data: {
+        participants: {
+          updateMany: {
+            data: {
+              isVideoOn: options.isVideoOn,
+              isMicrophoneOn: options.isMicrophoneOn,
+            },
+            where: {
+              userId: userId,
+              socketId: socketId,
+              isPresent: true,
+            },
+          },
         },
-        where: {id: roomID},
-        include: {organizer: true, participants: true}
-      }
-    )
+      },
+      where: { id: roomID },
+      include: { organizer: true, participants: true },
+    });
   }
 
-  leaveMeet({roomID, socketId, userId}: {
-    roomID: string,
-    socketId: string,
-    userId: string
+  leaveMeet({
+    roomID,
+    socketId,
+    userId,
+  }: {
+    roomID: string;
+    socketId: string;
+    userId: string;
   }) {
-    return this.prisma.meeting.update(
-      {
-        data: {
-          participants: {
-            updateMany: {
-              data: {
-                isPresent: false,
-                isVideoOn: false,
-                isMicrophoneOn: false,
-              },
-              where: {
-                userId: userId,
-                socketId: socketId,
-                isPresent: true
-              }
-            }
-          }
+    return this.prisma.meeting.update({
+      data: {
+        participants: {
+          updateMany: {
+            data: {
+              isPresent: false,
+              isVideoOn: false,
+              isMicrophoneOn: false,
+            },
+            where: {
+              userId: userId,
+              socketId: socketId,
+              isPresent: true,
+            },
+          },
         },
-        where: {id: roomID},
-        include: {organizer: true, participants: true}
-      }
-    )
+      },
+      where: { id: roomID },
+      include: { organizer: true, participants: true },
+    });
   }
 
   getMessages(userId: string, roomID: string) {
     return this.prisma.meeting.findFirst({
       where: {
-        id: roomID
+        id: roomID,
       },
       include: {
         messages: {
           include: {
-            sender: true
-          }
-        }
-      }
-    })
+            sender: true,
+          },
+        },
+      },
+    });
   }
 
-  saveMessage({roomID, message, userId}: {
-    roomID: string,
-    userId: string,
-    message: string
+  saveMessage({
+    roomID,
+    message,
+    userId,
+  }: {
+    roomID: string;
+    userId: string;
+    message: string;
   }) {
     return this.prisma.message.create({
       data: {
         meetingId: roomID,
         content: message,
-        senderId: userId
+        senderId: userId,
       },
       include: {
-        sender: true
-      }
-    })
+        sender: true,
+      },
+    });
   }
 }

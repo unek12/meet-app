@@ -42,7 +42,7 @@ const MeetHistory: React.FC = () => {
         header={<span style={{
           fontSize: 24,
           fontWeight: 600
-        }}>Previous meetings</span>}
+        }}>Предыдщие видео встречи</span>}
         footer=
           {
             !isLoading &&
@@ -67,12 +67,11 @@ const MeetHistory: React.FC = () => {
               width: '100%'
             }}>
               <div>
-                {
-                  item.title
-                }
-                -
-                {
-                  item.date
+                Название: {item.title}
+                <br/>
+                Время: {
+                  // @ts-ignore
+                  Date(item.date.toString()).toLocaleString('en-GB', { timeZone: 'UTC' })
                 }
               </div>
               <Button
@@ -80,7 +79,7 @@ const MeetHistory: React.FC = () => {
                   nav(`/chat/${item.id}`)
                 }}
               >
-                details
+                запись чата
               </Button>
             </div>
           </List.Item>

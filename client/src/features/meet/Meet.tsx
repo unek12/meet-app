@@ -185,6 +185,7 @@ const Meet: FC<{
               }}
               type={'primary'}
               onClick={() => startScreenSharing()}
+              disabled={!!clients.find(clientID => clientID === LOCAL_SHARING)}
             >
               screen sharing
             </Button>

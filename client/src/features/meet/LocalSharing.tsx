@@ -1,5 +1,5 @@
 import React, {FC, RefObject, useEffect, useRef, useState} from 'react';
-import {LOCAL_VIDEO, localMediaStreamsType} from "../../hooks/useWebRTC";
+import { LOCAL_SHARING, LOCAL_VIDEO, localMediaStreamsType } from '../../hooks/useWebRTC';
 
 export const LocalSharing: FC<{
   clientID: string,
@@ -50,7 +50,8 @@ export const LocalSharing: FC<{
         ref={videoRef}
         autoPlay
         playsInline
-        muted={clientID === LOCAL_VIDEO}/>
+        muted={true}
+      />
     </div>
   );
 };

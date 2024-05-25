@@ -4,19 +4,17 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
-  OnGatewayDisconnect, OnGatewayConnection, OnGatewayInit,
-} from '@nestjs/websockets'
-import {Namespace, Server, Socket} from 'socket.io'
-import {MeetService} from "./meet.service";
-
+  OnGatewayConnection,
+  OnGatewayInit,
+} from '@nestjs/websockets';
+import { Namespace, Socket } from 'socket.io';
+import { MeetService } from './meet.service';
 
 @WebSocketGateway({
-  namespace: 'meet'
+  namespace: 'meet',
 })
 export class MeetGateway implements OnGatewayConnection, OnGatewayInit {
-
-  constructor(private meetService: MeetService) {
-  }
+  constructor(private meetService: MeetService) {}
 
   @WebSocketServer()
   server: Namespace;
@@ -27,6 +25,7 @@ export class MeetGateway implements OnGatewayConnection, OnGatewayInit {
 
   // @UseGuards(accessTokenWSGuard)
   handleConnection(@ConnectedSocket() socket: any) {
+    console.log(socket);
     // if (socket.handshake.query['transport'] !== 'polling') {
     //
     // }
@@ -38,7 +37,9 @@ export class MeetGateway implements OnGatewayConnection, OnGatewayInit {
   getClientRooms(): string[] {
     const rooms = this.server.adapter.rooms;
 
-    return Array.from(rooms.keys()).filter(roomID => this.validate(roomID) && this.version(roomID) === 4);
+    return Array.from(rooms.keys()).filter(
+      (roomID) => this.validate(roomID) && this.version(roomID) === 4,
+    );
   }
 
   shareRoomsInfo(): void {
@@ -49,100 +50,98 @@ export class MeetGateway implements OnGatewayConnection, OnGatewayInit {
 
   @SubscribeMessage('join')
   handleJoin(@ConnectedSocket() socket: any, @MessageBody() config: any) {
-    const {
-      room: roomID,
-      isScreenShare,
-      isVideoOn,
-      isMicrophoneOn
-    } = config;
+    const { room: roomID, isScreenShare, isVideoOn, isMicrophoneOn } = config;
     const joinedRooms = socket.rooms;
-
+    console.log(config);
     if (Array.from(this.server.adapter.rooms.get(roomID) || []).length > 9) {
-      return
+      return;
     }
 
-    this.meetService.joinMeet({
-      roomID,
-      userId: socket.userId,
-      socketId: socket.id,
-      options: {
-        isVideoOn,
-        isMicrophoneOn
-      }
-    })
+    this.meetService
+      .joinMeet({
+        roomID,
+        userId: socket.userId,
+        socketId: socket.id,
+        options: {
+          isVideoOn,
+          isMicrophoneOn,
+        },
+      })
       .then((meet) => {
-
         if (!meet) {
-          return
+          return;
         }
-        const clients = Array.from(this.server.adapter.rooms.get(roomID) || [])
-          .filter(clientID => clientID !== socket.id);
+        const clients = Array.from(
+          this.server.adapter.rooms.get(roomID) || [],
+        ).filter((clientID) => clientID !== socket.id);
 
-        const joiningClientSettings = meet.participants.find(item => item.socketId === socket.id && item.isPresent)
-        clients
-          .forEach(clientID => {
-            console.log(clientID)
-            const clientSettings =
-              meet.participants.find(item => item.socketId === clientID && item.isPresent)
-            console.log(clientSettings)
+        const joiningClientSettings = meet.participants.find(
+          (item) => item.socketId === socket.id && item.isPresent,
+        );
+        clients.forEach((clientID) => {
+          console.log(clientID);
+          console.log(123);
+          const clientSettings = meet.participants.find(
+            (item) => item.socketId === clientID && item.isPresent,
+          );
+          console.log(clientSettings);
 
-            this.server.to(clientID).emit('add-peer', {
-              peerID: socket.id,
-              createOffer: false,
-              isScreenShare,
-              isVideoOn: joiningClientSettings.isVideoOn,
-              isMicrophoneOn: joiningClientSettings.isMicrophoneOn,
-              avatar: joiningClientSettings.user.avatar,
-              username: joiningClientSettings.user.username
-            });
-
-            socket.emit('add-peer', {
-              peerID: clientID,
-              createOffer: true,
-              isScreenShare,
-              isVideoOn: clientSettings.isVideoOn,
-              isMicrophoneOn: clientSettings.isMicrophoneOn ,
-              avatar: clientSettings.user.avatar,
-              username: clientSettings.user.username
-            });
+          this.server.to(clientID).emit('add-peer', {
+            peerID: socket.id,
+            createOffer: false,
+            isScreenShare,
+            isVideoOn: joiningClientSettings.isVideoOn,
+            isMicrophoneOn: joiningClientSettings.isMicrophoneOn,
+            avatar: joiningClientSettings.user.avatar,
+            username: joiningClientSettings.user.username,
           });
 
-        if (!isScreenShare)
-          socket.join(roomID);
+          socket.emit('add-peer', {
+            peerID: clientID,
+            createOffer: true,
+            isScreenShare,
+            isVideoOn: clientSettings.isVideoOn,
+            isMicrophoneOn: clientSettings.isMicrophoneOn,
+            avatar: clientSettings.user.avatar,
+            username: clientSettings.user.username,
+          });
+        });
+
+        if (!isScreenShare) socket.join(roomID);
       })
-      .catch()
+      .catch();
 
     // if (Array.from(joinedRooms).includes(roomID) && !isScreenShare) {
     //   console.warn(`Already joined to ${roomID}`);
     //   return;
     // }
     socket.on('disconnecting', () => {
-      const {rooms} = socket;
+      const { rooms } = socket;
 
-      this.meetService.leaveMeet({
-        roomID,
-        userId: socket.userId,
-        socketId: socket.id
-      })
+      this.meetService
+        .leaveMeet({
+          roomID,
+          userId: socket.userId,
+          socketId: socket.id,
+        })
         .then(() => {
-          const clients = Array.from(this.server.adapter.rooms.get(roomID) || []);
-          clients
-            .forEach(clientID => {
-              this.server.to(clientID).emit('remove-peer', {
-                peerID: socket.id,
-              });
-
-              socket.emit('remove-peer', {
-                peerID: clientID,
-              });
+          const clients = Array.from(
+            this.server.adapter.rooms.get(roomID) || [],
+          );
+          clients.forEach((clientID) => {
+            this.server.to(clientID).emit('remove-peer', {
+              peerID: socket.id,
             });
+
+            socket.emit('remove-peer', {
+              peerID: clientID,
+            });
+          });
 
           socket.leave(roomID);
         })
-        .catch(() => {
-
-        })
-    })
+        .catch(() => {});
+    });
   }
 
   @SubscribeMessage('leave')
@@ -155,15 +154,15 @@ export class MeetGateway implements OnGatewayConnection, OnGatewayInit {
       .forEach((roomID: string) => {
         const clients = Array.from(this.server.adapter.rooms.get(roomID) || []);
 
-        clients.forEach(clientID => {
+        clients.forEach((clientID) => {
           this.server.to(clientID).emit('remove-peer', {
             peerID: socket.id,
-            isScreenShare
+            isScreenShare,
           });
 
           socket.emit('remove-peer', {
             peerID: clientID,
-            isScreenShare
+            isScreenShare,
           });
         });
 
@@ -172,66 +171,86 @@ export class MeetGateway implements OnGatewayConnection, OnGatewayInit {
   }
 
   @SubscribeMessage('relay-sdp')
-  handleRelaySdp(@ConnectedSocket() socket: Socket, @MessageBody() config: any) {
-    const {peerID, sessionDescription, isScreenShare} = config
+  handleRelaySdp(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() config: any,
+  ) {
+    const { peerID, sessionDescription, isScreenShare } = config;
     this.server.to(peerID).emit('session-description', {
       peerID: socket.id,
       sessionDescription,
       isScreenShare,
-      from: socket.id
+      from: socket.id,
     });
   }
 
   @SubscribeMessage('relay-ice')
-  handleRelayIce(@ConnectedSocket() socket: Socket, @MessageBody() config: any) {
-    const {peerID, iceCandidate, isScreenShare} = config
+  handleRelayIce(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() config: any,
+  ) {
+    const { peerID, iceCandidate, isScreenShare } = config;
     this.server.to(peerID).emit('ice-candidate', {
       peerID: socket.id,
       isScreenShare,
       iceCandidate,
-      from: socket.id
+      from: socket.id,
     });
   }
 
   @SubscribeMessage('toggle-options')
   handleMicToggle(@ConnectedSocket() socket: any, @MessageBody() config: any) {
-    const {isMicrophoneOn, isVideoOn, roomID} = config
+    const { isMicrophoneOn, isVideoOn, roomID } = config;
 
-    this.meetService.toggleOptions({
-      roomID, socketId: socket.id, userId: socket.userId, options: {
-        isMicrophoneOn,
-        isVideoOn
-      }
-    }).then(res => console.log(res.participants.find(item => item.socketId === socket.id)))
+    this.meetService
+      .toggleOptions({
+        roomID,
+        socketId: socket.id,
+        userId: socket.userId,
+        options: {
+          isMicrophoneOn,
+          isVideoOn,
+        },
+      })
+      .then((res) =>
+        console.log(
+          res.participants.find((item) => item.socketId === socket.id),
+        ),
+      );
 
-    const clients = Array.from(this.server.adapter.rooms.get(roomID) || [])
+    const clients = Array.from(this.server.adapter.rooms.get(roomID) || []);
 
-    clients.forEach(client => {
+    clients.forEach((client) => {
       this.server.to(client).emit('toggle-options', {
         peerID: socket.id,
         isMicrophoneOn,
-        isVideoOn
+        isVideoOn,
       });
-    })
+    });
   }
 
   @SubscribeMessage('messages:get')
   handleMessage(@ConnectedSocket() socket: Socket) {
-    socket.emit('messages:get', [])
+    socket.emit('messages:get', []);
   }
 
   @SubscribeMessage('message:post')
-  handleSendMessage(@ConnectedSocket() socket: any, @MessageBody() options: any) {
-    const {roomID, message} = options;
+  handleSendMessage(
+    @ConnectedSocket() socket: any,
+    @MessageBody() options: any,
+  ) {
+    const { roomID, message } = options;
 
-    this.meetService.saveMessage({userId: socket.userId, ...options}).then(message => {
-      const clients = Array.from(this.server.adapter.rooms.get(roomID) || []);
-      clients
-        // .filter(clientID => clientID !== socket.id)
-        .forEach(clientID => {
-          this.server.to(clientID).emit('messages', message)
-        });
-    })
+    this.meetService
+      .saveMessage({ userId: socket.userId, ...options })
+      .then((message) => {
+        const clients = Array.from(this.server.adapter.rooms.get(roomID) || []);
+        clients
+          // .filter(clientID => clientID !== socket.id)
+          .forEach((clientID) => {
+            this.server.to(clientID).emit('messages', message);
+          });
+      });
   }
 
   private validate(roomID: string): boolean {

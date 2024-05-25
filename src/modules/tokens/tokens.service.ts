@@ -16,7 +16,7 @@ export class TokensService {
       {
         // secret: this.configService.get<string>('JWT_ACCESS_SECRET') || 'secret key',
         secret: process.env['JWT_ACCESS_SECRET'] || 'secret key',
-        expiresIn: '1h',
+        expiresIn: '10d',
       },
     )
 
