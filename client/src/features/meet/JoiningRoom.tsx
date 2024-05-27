@@ -124,7 +124,7 @@ const JoiningRoom: FC<Props> = ({children}) => {
             setMic(!mic)
           }}
         >
-          mic
+          микрофон
         </Button>
         <Button
           type={video ? 'primary' : 'default'}
@@ -135,14 +135,14 @@ const JoiningRoom: FC<Props> = ({children}) => {
             setVideo(!video)
           }}
         >
-          video
+          видео
         </Button>
         <Button
           type={'primary'}
           disabled={isLoading || mediaError || !data}
           onClick={() => setJoined(true)}
         >
-          Join
+          присоединиться
         </Button>
       </div>
     </div>

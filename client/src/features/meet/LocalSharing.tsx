@@ -39,7 +39,7 @@ export const LocalSharing: FC<{
         padding: '4px 10px',
         borderRadius: '10px',
       }}>
-        your screen sharing
+        Ваш экран
       </div>
       <video
         width='100%'

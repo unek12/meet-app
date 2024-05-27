@@ -162,7 +162,7 @@ const Meet: FC<{
                 setMic(!mic)
               }}
             >
-              mic
+              микрофон
             </Button>
             <Button
               style={{
@@ -177,7 +177,7 @@ const Meet: FC<{
                 setVideo(!video)
               }}
             >
-              video
+              видео
             </Button>
             <Button
               style={{
@@ -187,7 +187,7 @@ const Meet: FC<{
               onClick={() => startScreenSharing()}
               disabled={!!clients.find(clientID => clientID === LOCAL_SHARING)}
             >
-              screen sharing
+              поделится экраном
             </Button>
 
             <Button
@@ -197,7 +197,7 @@ const Meet: FC<{
               type={'primary'}
               onClick={() => setChat(!chat)}
             >
-              show chat
+              чат
             </Button>
           </div>
           <div>
@@ -205,7 +205,7 @@ const Meet: FC<{
               type={'primary'}
               onClick={() => nav('/')}
             >
-              leave
+              выйти
             </Button>
           </div>
         </div>

@@ -6,6 +6,7 @@ import { UserTab } from './UserTab';
 import {MeetTab} from "./MeetTab";
 import {useNavigate} from "react-router-dom";
 import {useAuth} from "../../hooks/useAuth";
+import { MeetTable } from "./MeetTable";
 
 const items: MenuProps['items'] = [
   {
@@ -14,8 +15,13 @@ const items: MenuProps['items'] = [
     // icon: <MailOutlined/>,
   },
   {
-    label: 'Meetings',
+    label: 'Meetings Chart',
     key: 'meet',
+    // icon: <MailOutlined/>,
+  },
+  {
+    label: 'Meetings',
+    key: 'meet-table',
     // icon: <MailOutlined/>,
   },
   {
@@ -51,6 +57,11 @@ const AdminPanel: React.FC = () => {
       {
         current === 'meet' &&
         <MeetTab/>
+      }
+
+      {
+        current === 'meet-table' &&
+        <MeetTable/>
       }
 
       {
