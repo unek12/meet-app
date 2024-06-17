@@ -2,6 +2,7 @@ import {createSlice} from '@reduxjs/toolkit'
 import type {PayloadAction} from '@reduxjs/toolkit'
 import type {RootState} from '../../store'
 import {userApi} from "../../services/user";
+import { authApi } from '../../services/auth';
 
 export interface User {
   id: string

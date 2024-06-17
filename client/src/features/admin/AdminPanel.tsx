@@ -10,22 +10,22 @@ import { MeetTable } from "./MeetTable";
 
 const items: MenuProps['items'] = [
   {
-    label: 'Main page',
+    label: 'Главная',
     key: 'main',
     // icon: <MailOutlined/>,
   },
   {
-    label: 'Meetings Chart',
+    label: 'Статистика встреч',
     key: 'meet',
     // icon: <MailOutlined/>,
   },
   {
-    label: 'Meetings',
+    label: 'Встречи',
     key: 'meet-table',
     // icon: <MailOutlined/>,
   },
   {
-    label: 'Users',
+    label: 'Пользователи',
     key: 'user',
     // icon: <MailOutlined/>,
   },

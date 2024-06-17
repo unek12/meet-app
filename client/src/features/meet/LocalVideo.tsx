@@ -45,7 +45,7 @@ export const LocalVideo: FC<{
         padding: '4px 10px',
         borderRadius: '10px'
       }}>
-        you
+        Вы
       </div>
 
       {

@@ -25,7 +25,6 @@ export class MeetGateway implements OnGatewayConnection, OnGatewayInit {
 
   // @UseGuards(accessTokenWSGuard)
   handleConnection(@ConnectedSocket() socket: any) {
-    console.log(socket);
     // if (socket.handshake.query['transport'] !== 'polling') {
     //
     // }
@@ -84,7 +83,7 @@ export class MeetGateway implements OnGatewayConnection, OnGatewayInit {
           const clientSettings = meet.participants.find(
             (item) => item.socketId === clientID && item.isPresent,
           );
-          console.log(clientSettings);
+          console.log('clientSettings', clientSettings);
 
           this.server.to(clientID).emit('add-peer', {
             peerID: socket.id,
@@ -94,6 +93,7 @@ export class MeetGateway implements OnGatewayConnection, OnGatewayInit {
             isMicrophoneOn: joiningClientSettings.isMicrophoneOn,
             avatar: joiningClientSettings.user.avatar,
             username: joiningClientSettings.user.username,
+            name: joiningClientSettings.user.name,
           });
 
           socket.emit('add-peer', {
@@ -104,6 +104,7 @@ export class MeetGateway implements OnGatewayConnection, OnGatewayInit {
             isMicrophoneOn: clientSettings.isMicrophoneOn,
             avatar: clientSettings.user.avatar,
             username: clientSettings.user.username,
+            name: clientSettings.user.name,
           });
         });
 

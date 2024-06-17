@@ -37,14 +37,24 @@ export const ChatHistory = () => {
           }}
         >
           {data &&
-            data.messages.map((message: Message) =>
-              <List.Item>
-                <List.Item.Meta
-                  title={<div style={{textAlign: 'left'}}>{message.sender.username}</div>}
-                  description={<div style={{textAlign: 'left'}}>{message.content}</div>}
-                />
-              </List.Item>
-            )
+            <div>
+              {data.messages.map((message: Message) =>
+                <List.Item>
+                  <List.Item.Meta
+                    title={<div style={{ textAlign: 'left' }}>{message.sender.name || message.sender.username}</div>}
+                    description={<div style={{ textAlign: 'left' }}>{message.content}</div>}
+                  />
+                </List.Item>,
+              )}
+              <Button
+                onClick={() => {
+                  nav(`/`)
+                }}
+                type={'primary'}
+              >
+                Главная
+              </Button>
+            </div>
           }
         </List>
       </Content>

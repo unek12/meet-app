@@ -14,12 +14,19 @@ export const Video: FC<{
   const [mic, setMic] = useState(true)
   const [imgUrl, setImgUrl ] = useState('')
   const [username, setUsername] = useState('')
+  const [name, setName] = useState('')
+  const [isScreenShare, setIsScreenShare] = useState(false)
+
 
   useEffect(() => {
+    console.log(!clientID.includes('screen-share'));
     if (peerConnections.current && peerConnections.current[clientID]) {
 
       setImgUrl(peerConnections.current[clientID].avatar)
       setUsername(peerConnections.current[clientID].username)
+      setName(peerConnections.current[clientID].name)
+      setIsScreenShare(peerConnections.current[clientID].isScreenShare)
+      console.log(peerConnections.current[clientID]);
 
       peerConnections.current[clientID].connection.ontrack = ({streams: [remoteStream]}) => {
         if (remoteStream.getTracks().length === 2 || peerConnections.current![clientID].isScreenShare) {
@@ -85,10 +92,11 @@ export const Video: FC<{
         padding: '4px 10px',
         borderRadius: '10px'
       }}>
-        {username}
+        {name || username}
       </div>
 
       {
+        !isScreenShare ?
         mic ?
           <AudioOutlined
             style={{
@@ -107,6 +115,8 @@ export const Video: FC<{
               fontSize: 20,
             }}
           />
+          :
+          <></>
       }
 
       <div style={{

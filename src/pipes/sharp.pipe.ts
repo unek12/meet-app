@@ -6,7 +6,7 @@ import * as sharp from 'sharp';
 export class SharpPipe implements PipeTransform<Express.Multer.File> {
   async transform(image: Express.Multer.File) {
     const originalName = path.parse(image.originalname).name;
-    const filename = Date.now() + '-' + originalName + '.' + image.mimetype.split(`/`)[1];
+    const filename = Date.now() + '.' + image.mimetype.split(`/`)[1];
 
     const res = await sharp(path.join(__dirname, '../..', image.path))
       .resize({

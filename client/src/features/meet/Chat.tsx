@@ -31,7 +31,7 @@ const Chat = ({roomID}: { roomID: string }) => {
               // </div>
               <List.Item>
                 <List.Item.Meta
-                  title={<div style={{textAlign: 'left'}}>{message.sender.username}</div>}
+                  title={<div style={{textAlign: 'left'}}>{message.sender.name || message.sender.username}</div>}
                   description={<div style={{textAlign: 'left'}}>{message.content}</div>}
                 />
               </List.Item>

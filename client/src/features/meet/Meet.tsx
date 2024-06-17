@@ -8,12 +8,12 @@ import {LocalVideo} from "./LocalVideo";
 import {LocalSharing} from "./LocalSharing";
 import {Button} from "antd";
 import {MeetIdPopUp} from "./MeetIdPopUp";
+import { useGetMeetingQuery } from '../../services/meet';
 
 function calculateDimensions(userCount: number, totalWidth: number, totalHeight: number) {
   const aspectRatio = 16 / 9; // Формат 16:9
   let rows = Math.ceil(userCount / 3); // Количество строк, максимум 3 колонки в строке
   let columns = Math.min(userCount, 3); // Количество столбцов, максимум 3 колонки
-
   if (userCount === 2) {
     rows = 1;
     columns = 2;
@@ -44,6 +44,7 @@ const Meet: FC<{
 }> = ({initVideo, initMic}) => {
   const {id: roomID} = useParams();
   const nav = useNavigate()
+  const {data, isLoading} = useGetMeetingQuery(roomID)
 
   if (!roomID) {
     nav('/')
@@ -56,7 +57,8 @@ const Meet: FC<{
     toggleOptions,
     startScreenSharing,
     peerConnections,
-    localMediaStreams
+    localMediaStreams,
+    name
   } = useWebRTC(roomID!, initVideo, initMic);
 
   const [video, setVideo] = useState(initVideo)
@@ -87,58 +89,74 @@ const Meet: FC<{
     <div style={{
       display: "flex",
       overflow: "hidden",
-      position: "relative"
+      position: "relative",
     }}>
-      <div style={{
-        width: chat ? '70vw' : '100vw',
-        height: '100vh',
-        display: "flex",
-        flexDirection: 'column'
-      }}>
-
-        <div style={{
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-evenly',
-          flexWrap: 'wrap',
-          maxHeight: 'calc(100vh - 50px)',
-          height: '100%'
+      <div
+        style={{
+          display: "flex",
+          flexDirection: 'column'
         }}
-             ref={elementRef}
-        >
+      >
+        <div style={{
+          fontWeight: 500,
+          fontSize: 42,
+          fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'"
+        }}>
           {
-            clients.map((clientID, index) => {
-              if (clientID === LOCAL_VIDEO) {
-                return <LocalVideo
-                  key={clientID}
-                  clientID={clientID}
-                  videoLayout={videoLayout[index]}
-                  localMediaStreams={localMediaStreams}
-                  video={video}
-                  mic={mic}
-                  setMic={setMic}
-                  setVideo={setVideo}
-                />
-              }
-
-              if (clientID === LOCAL_SHARING) {
-                return <LocalSharing
-                  key={clientID}
-                  clientID={clientID}
-                  videoLayout={videoLayout[index]}
-                  localMediaStreams={localMediaStreams}
-                />
-              }
-
-              return (<Video
-                key={clientID}
-                videoLayout={videoLayout[index]}
-                clientID={clientID}
-                peerConnections={peerConnections}
-              />);
-            })
+            data.title
           }
+        </div>
+        <div style={{
+          width: chat ? '70vw' : '100vw',
+          height: 'calc(100vh - 100px)',
+          display: "flex",
+          flexDirection: 'column'
+        }}>
+
+          <div style={{
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-evenly',
+            flexWrap: 'wrap',
+            maxHeight: 'calc(100vh - 50px)',
+            height: '100%'
+          }}
+               ref={elementRef}
+          >
+            {
+              clients.map((clientID, index) => {
+                if (clientID === LOCAL_VIDEO) {
+                  return <LocalVideo
+                    key={clientID}
+                    clientID={clientID}
+                    videoLayout={videoLayout[index]}
+                    localMediaStreams={localMediaStreams}
+                    video={video}
+                    mic={mic}
+                    setMic={setMic}
+                    setVideo={setVideo}
+                  />
+                }
+
+                if (clientID === LOCAL_SHARING) {
+                  return <LocalSharing
+                    key={clientID}
+                    clientID={clientID}
+                    videoLayout={videoLayout[index]}
+                    localMediaStreams={localMediaStreams}
+                  />
+                }
+
+                return (<Video
+                  key={clientID}
+                  videoLayout={videoLayout[index]}
+                  clientID={clientID}
+                  peerConnections={peerConnections}
+                />);
+              })
+            }
+          </div>
         </div>
 
         <div style={{
@@ -185,7 +203,7 @@ const Meet: FC<{
               }}
               type={'primary'}
               onClick={() => startScreenSharing()}
-              disabled={!!clients.find(clientID => clientID === LOCAL_SHARING)}
+              disabled={!!clients.find(clientID => clientID === LOCAL_SHARING) || !!clients.find(clientID => clientID.includes('screen-share'))}
             >
               поделится экраном
             </Button>

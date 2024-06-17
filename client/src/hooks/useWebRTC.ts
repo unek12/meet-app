@@ -13,6 +13,7 @@ export type peerConnectionsType = {
     microphone: boolean,
     isScreenShare: boolean,
     username: string,
+    name: string,
     avatar: string
   }
 }
@@ -24,6 +25,7 @@ export type localMediaStreamsType = {
     microphone: boolean,
     isScreenShare: boolean,
     username: string,
+    name: string,
     avatar: string
   }
 }
@@ -47,6 +49,8 @@ const unProcessPeerID = ({peerID, isScreenShare}: { peerID: string, isScreenShar
 
 export default function useWebRTC(roomID: string, initVideo: boolean, initMic: boolean) {
   const [clients, updateClients] = useState<string[]>([]);
+  const [name, setName] = useState<string>('');
+
   const user = useAuth()!
 
   const addNewClient = useCallback((newClient: string) => {
@@ -57,7 +61,6 @@ export default function useWebRTC(roomID: string, initVideo: boolean, initMic: b
   const localMediaStreams = useRef<localMediaStreamsType>({});
 
   const toggleOptions = (options: { isVideoOn: boolean, isMicrophoneOn: boolean }) => {
-    console.log(options)
     const audioTracks = localMediaStreams.current[LOCAL_VIDEO].connection.getAudioTracks();
     const videoTracks = localMediaStreams.current[LOCAL_VIDEO].connection.getVideoTracks();
     if (audioTracks) {
@@ -84,6 +87,7 @@ export default function useWebRTC(roomID: string, initVideo: boolean, initMic: b
                                    isMicrophoneOn,
                                    isScreenShare = false,
                                    username,
+                                   name,
                                    avatar
                                  }: {
       peerID: string
@@ -92,6 +96,7 @@ export default function useWebRTC(roomID: string, initVideo: boolean, initMic: b
       isVideoOn: boolean
       isMicrophoneOn: boolean
       username: string
+      name: string
       avatar: string
     }) {
       peerID = processPeerID({peerID, isScreenShare})
@@ -107,6 +112,7 @@ export default function useWebRTC(roomID: string, initVideo: boolean, initMic: b
         microphone: isMicrophoneOn,
         isScreenShare,
         username,
+        name,
         avatar
       }
       console.log(peerConnections.current[peerID])
@@ -255,6 +261,7 @@ export default function useWebRTC(roomID: string, initVideo: boolean, initMic: b
         microphone: initMic,
         isScreenShare: false,
         username: user.username,
+        name: user.name,
         avatar: user.avatar
       }
 
@@ -290,6 +297,7 @@ export default function useWebRTC(roomID: string, initVideo: boolean, initMic: b
           microphone: true,
           isScreenShare: true,
           username: user.username,
+          name: user.name,
           avatar: user.avatar
         }
 
@@ -324,6 +332,7 @@ export default function useWebRTC(roomID: string, initVideo: boolean, initMic: b
     toggleOptions,
     startScreenSharing,
     peerConnections,
-    localMediaStreams
+    localMediaStreams,
+    name
   };
 }

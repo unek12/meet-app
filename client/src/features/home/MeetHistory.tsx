@@ -19,15 +19,15 @@ const MeetHistory: React.FC = () => {
   const [initLoading, setInitLoading] = useState(true);
   const [current, setCurrent] = useState(0);
   const user = useAuth()!
-  const {data, isLoading, isFetching} = useGetMeetingsForUserQuery({
+  const {data, isLoading, isFetching, refetch} = useGetMeetingsForUserQuery({
     userId: user.id,
     page: current,
     take: 10
   })
   const nav = useNavigate()
   useEffect(() => {
-    console.log(data)
-  }, [data]);
+    refetch()
+  }, []);
 
   return (
     <>
@@ -42,7 +42,7 @@ const MeetHistory: React.FC = () => {
         header={<span style={{
           fontSize: 24,
           fontWeight: 600
-        }}>Предыдщие видео встречи</span>}
+        }}>Предыдщие видеовстречи</span>}
         footer=
           {
             !isLoading &&

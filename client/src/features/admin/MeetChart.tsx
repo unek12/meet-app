@@ -4,7 +4,20 @@ import {useGetMeetingsStatsQuery} from "../../services/meet";
 import {Alert, Radio, Space, Spin} from "antd";
 
 type PaginationPosition = 'month' | 'week' | 'day';
-const positionOptions = ['month', 'week', 'day'];
+const positionOptions = [
+  {
+    value: 'month',
+    name: 'месяц'
+  },
+  {
+    value: 'week',
+    name: 'неделя'
+  },
+  {
+    value: 'day',
+    name: 'день'
+  },
+];
 export const MeetChart = () => {
   const [position, setPosition] = useState<PaginationPosition>('week');
   const {data, isLoading, isFetching} = useGetMeetingsStatsQuery({
@@ -39,8 +52,8 @@ export const MeetChart = () => {
             }}
           >
             {positionOptions.map((item) => (
-              <Radio.Button key={item} value={item}>
-                {item}
+              <Radio.Button key={item.value} value={item.value}>
+                {item.name}
               </Radio.Button>
             ))}
           </Radio.Group>
